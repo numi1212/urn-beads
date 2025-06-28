@@ -1,0 +1,14 @@
+---
+title: "Proportion of red beads"
+Author: Muhammad Numan
+format: html
+execute: 
+  echo: false
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+Understanding how characteristics of objects relate to their observed outcomes is a central goal in data science, especially when outcomes are categorical and covariates are physical traits like size. In this tutorial, we analyze simulated data from an urn containing 1,000 beads to explore how sampling helps us estimate the proportion of red beads.
