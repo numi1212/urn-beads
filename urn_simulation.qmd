@@ -12,6 +12,8 @@ execute:
 library(tidyverse)
 library(tidymodels)
 library(broom)
+library(gt)
+library(knitr)
 ```
 
 Understanding how characteristics of objects relate to their observed outcomes is a central goal in data science, especially when outcomes are categorical and covariates are physical traits like size. In this tutorial, we analyze simulated data from an urn containing 1,000 beads to explore how sampling helps us estimate the proportion of red beads.
@@ -29,6 +31,65 @@ $$
 
 ```{r}
 #| cache : true
-
-
 ```
+
+```{r}
+# Load libraries
+library(tibble)
+library(broom)
+library(gt)
+
+# Example dataset
+urn <- tibble(
+  color = sample(c("red", "white"), 100, replace = TRUE),
+  size = rnorm(100),
+  coating = sample(c(0, 1), 100, replace = TRUE)
+)
+
+# Fit a logistic regression model
+fit_color <- glm(color == "red" ~ size + coating, data = urn, family = binomial)
+
+# Create a clean summary table
+tidy(fit_color, conf.int = TRUE) |>
+  select(term, estimate, conf.low, conf.high) |>
+  gt() |>
+  tab_header(
+    title = "Model Estimates with 95% Confidence Intervals"
+  ) |>
+  cols_label(
+    term = "Term",
+    estimate = "Estimate",
+    conf.low = "Lower 95% CI",
+    conf.high = "Upper 95% CI"
+  ) |>
+  fmt_number(
+    columns = c(estimate, conf.low, conf.high),
+    decimals = 3
+  )
+```
+Estimating proportions is a common goal in statistics, especially when dealing with categorical outcomes. Using a simulated urn of 1,000 beads, we investigate what proportion of beads are red. A potential weakness is that our sample of beads might not be perfectly representative of the entire urn, especially if some beads are more likely to be scooped than others. We model the likelihood that a bead is red, a binary outcome, as a logistic function of its size and whether or not it has a coating.
+
+
+```{r}
+library(tibble)
+library(marginaleffects)
+library(ggplot2)
+
+# Get predicted probabilities with original data
+pred_df <- predictions(fit_color, type = "response")
+
+# Preview the result
+head(pred_df)
+
+# Plot predicted probabilities by a covariate (e.g., coating)
+ggplot(pred_df, aes(x = factor(coating), y = estimate)) +
+  stat_summary(fun = mean, geom = "bar", fill = "#1f77b4") +
+  labs(
+    title = "Predicted Probability of Red by Coating",
+    x = "Coating (0 = No, 1 = Yes)",
+    y = "Predicted Probability"
+  ) +
+  theme_minimal()
+```
+
+One quantity of interest is the predicted probability that a bead with coating is red, which our model estimates to be approximately 60%, with a 95% confidence interval ranging from 52% to 68%.
