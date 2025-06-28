@@ -8,7 +8,10 @@ execute:
 
 
 ```{r}
+#| message: false
 library(tidyverse)
 ```
 
 Understanding how characteristics of objects relate to their observed outcomes is a central goal in data science, especially when outcomes are categorical and covariates are physical traits like size. In this tutorial, we analyze simulated data from an urn containing 1,000 beads to explore how sampling helps us estimate the proportion of red beads.
+
+Estimating proportions is a common goal in statistics, especially when dealing with categorical outcomes and simple physical traits. Using a simulated urn of 1,000 beads, we investigate what proportion of beads are red through repeated random sampling. However, our results may be limited by the possibility that the sampling process is not fully representative of the entire urn, which could affect the accuracy and generalizability of our conclusions.
